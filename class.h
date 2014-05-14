@@ -1,5 +1,5 @@
-// Copyright YYYY Duncan Smith
-// https://github.com/dusmith1974/olap
+// Copyright @YYYY@ Duncan Smith
+// https://github.com/dusmith1974/@REPO@
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,23 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Contains a class representing an Xyz.
+// Contains a class representing a @Class@.
 
-#ifndef SUBDIR_XYZ_H_
-#define SUBDIR_XYZ_H_
+#ifndef @SUBDIR@__@CLASS@_H_
+#define @SUBDIR@__@CLASS@_H_
 
 #include <iostream>
 
-namespace olap {
+namespace @REPO@ {
 
-// The lap message.
-class Xyz /*final : public Message*/ {
+// The @Class@ class.
+class @Class@ /*final : public Base*/ {
  public:
-  Xyz();
-  /*virtual*/ ~Xyz();
+  @Class@();
+  /*virtual*/ ~@Class@();
 };
 
-}  // namespace olap
+}  // namespace @REPO@
 
-#endif  // SUBDIR_XYZ_H_
-
+#endif  // @SUBDIR@__@CLASS@_H_

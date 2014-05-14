@@ -1,13 +1,14 @@
 #! /bin/bash
 # Code snippet/template generator
 
-# TODO(ds) Just generates a class for now, extend for others
-# eg new class Xyx, new pimpl Xyx, new visitor
-# and have case call sub a .sh file for each.
+# TODO(ds) Just deals with classes for now, extend for other kinds
+# eg new pimpl Xyx, new visitor Xyz and have a case statement to 
+# call a sub .sh file for each kind.
 
+# For debugging.
 #set -x
 
-# Check the target name is given.
+# Check that the target name is given.
 if [ "$#" -lt 1 ]; then
   echo 'Give a class name, eg ./new subdir/MyNewClass'
   exit;
@@ -17,14 +18,14 @@ fi
 template_base=$(dirname $0)
 
 # Relative path of the given target.
-rel_path=$(dirname $1)
+subdir=$(dirname $1)
 
 # Target name (without path).
 class=$(basename $1)
 
-# Check the relative path exists.
-if [ ! -d "$rel_path" ]; then
-  echo "Path $rel_path not found.";
+# Check that the relative path exists.
+if [ ! -d "$subdir" ]; then
+  echo "Path $subdir not found.";
   exit;
 fi
 
@@ -39,15 +40,52 @@ function Hacker2Camel {
 }
 
 # Make cc and h paths.
-cc=$(Camel2Hacker $class)".cc"
-h=$(Camel2Hacker $class)".h"
+class_hacker=$(Camel2Hacker $class)
+cc=$class_hacker".cc"
+h=$class_hacker".h"
+cc_path=$subdir"/"$cc
+h_path=$subdir"/"$h
 
-cc_path=$rel_path"/"$cc
-h_path=$rel_path"/"$h
+# Don't overwrite an existing class.
+if [ -f $cc_path ] || [ -f $h_path ]; then
+  echo $cc_path" or "$h_path" already exist.";
+  exit;
+fi
 
-# Copy templates to targets and replace text.
+# Copy templates to targets.
 cp $template_base'/'class.cc $cc_path
 cp $template_base'/'class.h $h_path
 
+# Update copyright date.
 YYYY=$(echo $(date) |grep -Po '\d{4}')
-sed -i "1 s/YYYY/$YYYY/" $cc_path $h_path
+sed -i "1 s/@YYYY@/$YYYY/" $cc_path $h_path
+
+# Get the repo name (by working up the path until we hit the .git folder).
+repo=$(
+  basename $(
+    x=`pwd`; 
+    while [ "$x" != "/" ]; do 
+      x=`dirname "$x"`; 
+      echo "$x"; 
+      if [ `find "$x" -maxdepth 1 -name .git` ]; then 
+        break; 
+      fi; 
+    done
+  )
+)
+
+# Update the repo name.
+sed -i "s/@REPO@/$repo/" $cc_path $h_path
+
+# Update the subdir.
+sed -i "s/@SUBDIR@/${subdir^^}/" $cc_path $h_path
+
+# Update the class names.
+sed -i "s/@CLASS@/${class_hacker^^}/g" $cc_path $h_path
+sed -i "s/@Class@/$class/g" $cc_path $h_path
+
+# Update the include header (2nd sed escapes any path separators).
+sed -i "s/@h_path@/$(echo $h_path |sed 's/\//\\\//g')/" $cc_path
+
+# Add the .cc and .h to the repo.
+git add $cc_path $h_path
