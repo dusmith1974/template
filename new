@@ -1,0 +1,53 @@
+#! /bin/bash
+# Code snippet/template generator
+
+# TODO(ds) Just generates a class for now, extend for others
+# eg new class Xyx, new pimpl Xyx, new visitor
+# and have case call sub a .sh file for each.
+
+#set -x
+
+# Check the target name is given.
+if [ "$#" -lt 1 ]; then
+  echo 'Give a class name, eg ./new subdir/MyNewClass'
+  exit;
+fi
+
+# Location of this script (and hence the template sources).
+template_base=$(dirname $0)
+
+# Relative path of the given target.
+rel_path=$(dirname $1)
+
+# Target name (without path).
+class=$(basename $1)
+
+# Check the relative path exists.
+if [ ! -d "$rel_path" ]; then
+  echo "Path $rel_path not found.";
+  exit;
+fi
+
+# Replace Xy with _xy and remove leading underscore.
+function Camel2Hacker {
+  echo $(echo $1 |sed 's/\([A-Z]\)/_\l\1/g' |sed 's/^_//')
+}
+
+# Replace _x with X and capitalize the first char.
+function Hacker2Camel {
+  echo $(|sed 's/_\([a-z]\)/\u\1/g' |sed 's/^\([a-z]\)/\u\1/')
+}
+
+# Make cc and h paths.
+cc=$(Camel2Hacker $class)".cc"
+h=$(Camel2Hacker $class)".h"
+
+cc_path=$rel_path"/"$cc
+h_path=$rel_path"/"$h
+
+# Copy templates to targets and replace text.
+cp $template_base'/'class.cc $cc_path
+cp $template_base'/'class.h $h_path
+
+YYYY=$(echo $(date) |grep -Po '\d{4}')
+sed -i "1 s/YYYY/$YYYY/" $cc_path $h_path
