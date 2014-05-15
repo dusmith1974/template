@@ -1,15 +1,19 @@
 #! /bin/bash
 # Code snippet/template generator
 
-# TODO(ds) Just deals with classes for now, extend for other kinds
-# eg new pimpl Xyx, new visitor Xyz and have a case statement to 
-# call a sub .sh file for each kind.
-
 # For debugging.
 #set -x
 
+# TODO(ds) Just deals with classes for now, extend for other kinds
+# eg new pimpl Xyx, new visitor Xyz and have a case statement to 
+# call a sub .sh file for each kind.
+if [ "$1" != "class" ]; then 
+  echo "Try: new class subdir/ClassName";
+  exit;
+fi
+
 # Check that the target name is given.
-if [ "$#" -lt 1 ]; then
+if [ "$#" -lt 2 ]; then
   echo 'Give a class name, eg ./new subdir/MyNewClass'
   exit;
 fi
@@ -18,10 +22,10 @@ fi
 template_base=$(dirname $0)
 
 # Relative path of the given target.
-subdir=$(dirname $1)
+subdir=$(dirname $2)
 
 # Target name (without path).
-class=$(basename $1)
+class=$(basename $2)
 
 # Check that the relative path exists.
 if [ ! -d "$subdir" ]; then
@@ -31,12 +35,12 @@ fi
 
 # Replace Xy with _xy and remove leading underscore.
 function Camel2Hacker {
-  echo $(echo $1 |sed 's/\([A-Z]\)/_\l\1/g' |sed 's/^_//')
+  echo $(echo $1 |sed 's/\([A-Z]\)/_\l\1/' |sed 's/^_//')
 }
 
 # Replace _x with X and capitalize the first char.
 function Hacker2Camel {
-  echo $(|sed 's/_\([a-z]\)/\u\1/g' |sed 's/^\([a-z]\)/\u\1/')
+  echo $(echo $1 |sed 's/_\([a-z]\)/\u\1/g' |sed 's/^\([a-z]\)/\u\1/')
 }
 
 # Make cc and h paths.
