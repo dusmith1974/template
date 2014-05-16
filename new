@@ -35,7 +35,7 @@ fi
 
 # Replace Xy with _xy and remove leading underscore.
 function Camel2Hacker {
-  echo $(echo $1 |sed 's/\([A-Z]\)/_\l\1/' |sed 's/^_//')
+  echo $(echo $1 |sed 's/\([A-Z]\)/_\l\1/g' |sed 's/^_//')
 }
 
 # Replace _x with X and capitalize the first char.
