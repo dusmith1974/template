@@ -2,7 +2,7 @@
 # Code snippet/template generator
 
 # For debugging.
-#set -x
+# set -x
 
 # TODO(ds) Just deals with classes for now, extend for other kinds
 # eg new pimpl Xyx, new visitor Xyz and have a case statement to 
@@ -67,7 +67,7 @@ sed -i "1 s/@YYYY@/$YYYY/" $cc_path $h_path
 # Get the repo name (by working up the path until we hit the .git folder).
 repo=$(
   basename $(
-    x=`pwd`; 
+    x=`pwd`/dummy; 
     while [ "$x" != "/" ]; do 
       x=`dirname "$x"`; 
       echo "$x"; 
@@ -77,12 +77,19 @@ repo=$(
     done
   )
 )
+if [ -z "$repo" ]; then
+  echo "no repo found in curr dir tree."
+  rm $cc_path $h_path
+  exit;
+fi 
 
 # Update the repo name.
 sed -i "s/@REPO@/$repo/" $cc_path $h_path
 
 # Update the subdir.
-sed -i "s/@SUBDIR@/${subdir^^}/" $cc_path $h_path
+csubdir=${subdir^^}
+csubdir=$(echo $csubdir |sed 's/\//__/g')
+sed -i "s/@SUBDIR@/$csubdir/" $cc_path $h_path
 
 # Update the class names.
 sed -i "s/@CLASS@/${class_hacker^^}/g" $cc_path $h_path
