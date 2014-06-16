@@ -18,8 +18,6 @@
 #ifndef @SUBDIR@__@CLASS@_H_
 #define @SUBDIR@__@CLASS@_H_
 
-#include <iostream>
-
 namespace @REPO@ {
 
 // The @Class@ class.
